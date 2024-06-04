@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.ingress.SERVICENAME }}
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  selector:
+    app: asset-maintenance-web-frontend-pod
+  ports:
+    - protocol: TCP
+      port: {{ .Values.ingress.SERVICEPORT }}
+      targetPort: 1000

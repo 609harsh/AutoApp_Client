@@ -1,0 +1,18 @@
+build:
+  tag: ac334409
+  image: "registry.maximl.net/dev/ptw-and-dm/asset-maintenance-web-frontend"
+
+deployment:
+  use_specific_nodepool: false
+  nodepool_name: ""
+  replicaCount: 1
+
+
+ingress:
+  PRIMARY_URL: dev-apps.azure.maximl.com
+  CERTIFICATE_NAME: azure.maximl
+  PATH: /am/*
+  SERVICENAME: asset-maintenance-web-frontend-service
+  SERVICEPORT: 1000
+  tenants:
+    - CODE: dev

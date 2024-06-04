@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: asset-maintenance-web-frontend-nginxconf-generated-config
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "nginx-config/nginx.conf").AsConfig | indent 2 }}

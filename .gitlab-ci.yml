@@ -1,0 +1,140 @@
+stages:
+  - build_and_test
+  - build_info
+  - build_image
+  - release
+  - deploy
+
+
+variables:
+  IMAGE_K8S_PATH: registry.maximl.net/dev/ptw-and-dm/asset-maintenance-web-frontend
+  IMAGE_K8S_FQN: $IMAGE_K8S_PATH:$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
+  NPM_CACHE_DIR: "$CI_PROJECT_DIR/.cache/.npm"
+  CACHE: "cache"
+  HELM_CHART_VERSION: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
+  NODE_VERSION: 20-alpine3.19
+  
+build_frontend:
+  stage: build_and_test
+  image: node:$NODE_VERSION
+  before_script:
+    - echo "Job started at:" && date
+    - npm config set cache $NPM_CACHE_DIR --global
+  script:
+    - echo "npm install started at:" && date
+    - npm ci
+    - echo "npm install ended at:" && date
+    - npm run build
+  cache:
+    key: am-web-frontend
+    paths:
+      - $NPM_CACHE_DIR
+  variables:
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 6 hrs
+  tags:
+    - common-runner
+
+build_charts_and_buildinfo:
+  stage: build_and_test
+  image:
+    name: python:3.8-slim
+  before_script:
+    - pip install ruamel.yaml
+  script:
+    - python update_build_tag.py ./k8s/Chart.yaml ./k8s/values.yaml ./build_info.json $HELM_CHART_VERSION
+  after_script:
+    - cat ./k8s/Chart.yaml
+    - cat ./k8s/values.yaml
+    - cat build_info.json
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || ($RELEASE && $CI_COMMIT_BRANCH)
+      variables:
+        HELM_CHART_VERSION: 0.0.0-$CI_COMMIT_SHORT_SHA
+    - if: $RELEASE && $CI_COMMIT_TAG
+  artifacts:
+    when: always
+    paths:
+      - k8s/Chart.yaml
+      - k8s/values.yaml
+      - build_info.json
+  tags:
+    - common-runner
+
+build_frontend_image_kube:
+  stage: build_image
+  image: docker:19.03.0
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_REGISTRY_PASSWORD registry.maximl.net
+  script:
+    - docker pull $IMAGE_K8S_PATH:$CACHE || true
+    - docker build --cache-from=$IMAGE_K8S_PATH:$CACHE -t "dev/ptw-and-dm" .
+    - docker tag dev/ptw-and-dm $IMAGE_K8S_PATH:$CACHE
+    - docker tag dev/ptw-and-dm $IMAGE_K8S_FQN
+    - docker push $IMAGE_K8S_PATH:$CACHE
+    - docker push $IMAGE_K8S_FQN
+    - echo "docker image $IMAGE_K8S_FQN"
+  cache:
+    key: admin-web
+    paths:
+      - .cache
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || ($RELEASE && $CI_COMMIT_BRANCH)
+      variables:
+        IMAGE_K8S_FQN: $IMAGE_K8S_PATH:0.0.0-$CI_COMMIT_SHORT_SHA
+    - if: $RELEASE && $CI_COMMIT_TAG
+  needs: ["build_frontend"]
+  tags:
+    - common-runner
+
+release_helm_charts:
+  stage: release
+  image:
+    name: alpine/helm:3.9.3
+    entrypoint: ["/bin/sh", "-c"]
+  script:
+    - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - helm package ./k8s/
+    - helm push /builds/dev/ptw-and-dm/asset-maintenance-web-frontend/am-web-$HELM_CHART_VERSION.tgz oci://$CI_REGISTRY/dev/ptw-and-dm/asset-maintenance-web-frontend/helm-charts
+  dependencies:
+    - build_charts_and_buildinfo
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || ($RELEASE && $CI_COMMIT_BRANCH)
+      variables:
+        HELM_CHART_VERSION: 0.0.0-$CI_COMMIT_SHORT_SHA
+    - if: $RELEASE && $CI_COMMIT_TAG
+  tags:
+    - common-runner
+
+update_dev_manifests:
+  stage: deploy
+  image:
+    name: alpine/git
+    entrypoint: ["/bin/sh", "-c"]
+  before_script:
+    - apk add yq --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+    - git config --global user.email $GITLAB_USER_EMAIL
+    - git config --global user.name $GITLAB_USER_NAME
+  script:
+    - git clone https://na:${STAGING_MANIFESTS_PAT}@git.maximl.com/dev/devops/staging-manifests.git --single-branch --depth 1
+    - cd staging-manifests/projects/development/asset-maintenance-web-frontend
+    - yq -i '.dependencies[0].version = strenv(HELM_CHART_VERSION)' Chart.yaml
+    - git add Chart.yaml
+    - git commit -m "updated asset-maintenance-web-frontend chart version to $HELM_CHART_VERSION"
+    - git push https://na:${STAGING_MANIFESTS_PAT}@git.maximl.com/dev/devops/staging-manifests.git master
+  dependencies:
+    - release_helm_charts
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || ($RELEASE && $DEPLOY && $CI_COMMIT_BRANCH)
+      variables:
+        HELM_CHART_VERSION: 0.0.0-$CI_COMMIT_SHORT_SHA
+    - if: $RELEASE && $DEPLOY && $CI_COMMIT_TAG
+  tags:
+    - common-runner

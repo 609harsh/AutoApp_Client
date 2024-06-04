@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: http-ingress-{{ .Values.ingress.PRIMARY_URL }}-web-frontend
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/appgw-ssl-certificate: {{ .Values.ingress.CERTIFICATE_NAME }}
+    appgw.ingress.kubernetes.io/request-timeout: "120"
+    appgw.ingress.kubernetes.io/backend-path-prefix: "/"
+spec:
+  rules:
+    - host: {{ .Values.ingress.PRIMARY_URL }}
+      http:
+        paths:
+          {{- range $tenant := $.Values.ingress.tenants}}
+          - path: /{{$tenant.CODE}}{{ $.Values.ingress.PATH }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $.Values.ingress.SERVICENAME }}
+                port:
+                  number: {{ $.Values.ingress.SERVICEPORT }}
+          {{- end }}
+---

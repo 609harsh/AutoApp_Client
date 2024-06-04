@@ -1,0 +1,54 @@
+# Frontend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asset-maintenance-web-frontend-deployment
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: label1
+    type: service
+    dbaccess: 'false'
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: asset-maintenance-web-frontend-pod
+  template:
+    metadata:
+      labels:
+        app: asset-maintenance-web-frontend-pod
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: 'kubernetes.io/hostname'
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - asset-maintenance-web-frontend-pod
+      containers:
+        - name: asset-maintenance-web-frontend-nginx
+          image: '{{ .Values.build.image }}:{{ .Values.build.tag }}'
+          ports:
+            - containerPort: 1000
+          command: ['nginx', '-g', 'daemon off;']
+          volumeMounts:
+            - name: asset-maintenance-web-frontend-nginx-config
+              mountPath: '/etc/nginx/nginx.conf'
+              subPath: nginx.conf
+              readOnly: true
+
+      imagePullSecrets:
+        - name: maximl-registry-credentials
+
+      volumes:
+        - name: asset-maintenance-web-frontend-nginx-config
+          configMap:
+            name: asset-maintenance-web-frontend-nginxconf-generated-config
+            items:
+              - key: nginx.conf
+                path: nginx.conf

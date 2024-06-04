@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Helm chart for Asset Maintenance Web Frontend
+name: am-web
+version: 0.0.0
