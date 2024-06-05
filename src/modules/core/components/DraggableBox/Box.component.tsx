@@ -1,4 +1,4 @@
-import { Button, Checkbox } from 'antd';
+import { Checkbox } from 'antd';
 
 import { Box } from '../../interfaces/container.interface';
 import ButtonElement from '../Editor/WidgetElements/ButtonElement.component';
@@ -27,6 +27,7 @@ const AllComponents = {
 };
 
 const BoxComponent: React.FC<BoxComponentProps> = ({ box }) => {
+  //@ts-ignore
   const ComponentToRender = AllComponents[box.component];
 
   return (

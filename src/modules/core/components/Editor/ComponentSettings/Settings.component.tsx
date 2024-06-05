@@ -11,7 +11,7 @@ const Settings: React.FC = () => {
   if (!selectedComponentId) return;
 
   const box = boxes[selectedComponentId];
-  console.log(box);
+  //@ts-ignore
   const ComponentSettings = AllComponentsSettings[box.component];
   return (
     <>

@@ -39,7 +39,6 @@ export const DraggableBox = memo<DraggableBoxPropsType>(
     canvasHeight,
     key,
     id,
-    component,
     box,
     mode,
     resizingStatusChanged,
@@ -103,13 +102,16 @@ export const DraggableBox = memo<DraggableBoxPropsType>(
             maxWidth={canvasWidth}
             onDragStop={(e, direction) => {
               setDragging(false);
+              //@ts-ignore
               onDragStop(e, id, direction);
             }}
             onResizeStop={(e, direction, ref, d, position) => {
               setResizing(false);
+              //@ts-ignore
               onResizeStop(id, e, direction, ref, d, position);
             }}
             position={{
+              //@ts-ignore
               x: box ? (box.left * canvasWidth) / 100 : 0,
               y: box ? box.top : 0
             }}
