@@ -22,7 +22,7 @@ const universalProps = {
   }
 };
 
-const combineProperties = (widget, universal, isArray = false) => {
+const combineProperties = (widget:any, universal:any, isArray = false) => {
   return {
     ...universal,
     ...widget,

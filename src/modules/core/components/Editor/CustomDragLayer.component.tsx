@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import { useDragLayer } from 'react-dnd';
 import { BoxDragPreview } from './BoxDragPreview.component';
 
-const getItemStyles = (delta, item, initialOffset, currentOffset, initialClientOffset, canvasWidth, canvasHeight) => {
+const getItemStyles = (delta: any, item: any, initialOffset: any, currentOffset: any, initialClientOffset: any, canvasWidth: any, canvasHeight: any) => {
+  console.log(initialClientOffset)
   if (!initialOffset || !currentOffset) {
     return {
       display: 'none',

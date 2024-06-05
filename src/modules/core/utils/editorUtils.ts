@@ -1,6 +1,6 @@
 import { SetStateAction } from "react";
 
-export const capitalizeEveryWord = (str: string): string => {
+export const capitalizeEveryWord = (str: string | undefined): string | undefined=> {
   if (str===undefined || str.length === 0) {
       return str;
   }

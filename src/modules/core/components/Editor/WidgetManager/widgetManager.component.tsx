@@ -31,7 +31,7 @@ export const WidgetManager: React.FC = () => {
     }
   }
 
-  function renderList(header: string, items: Box[]) {
+  function renderList(header: string | undefined , items: Box[]) {
     if (isEmpty(items)) return null;
     return (
       <Flex vertical gap="middle" className="">
@@ -63,12 +63,12 @@ export const WidgetManager: React.FC = () => {
       );
     }
 
-    const commonSection = { title: 'commonly used', items: [] };
-    const layoutsSection = { title: 'layouts', items: [] };
-    const formSection = { title: 'forms', items: [] };
-    const integrationSection = { title: 'integrations', items: [] };
-    const otherSection = { title: 'others', items: [] };
-    const allWidgets: string[] = [];
+    const commonSection = { title: 'commonly used', items: new Array() };
+    const layoutsSection = { title: 'layouts', items: new Array() };
+    const formSection = { title: 'forms', items: new Array() };
+    const integrationSection = { title: 'integrations', items: new Array() };
+    const otherSection = { title: 'others', items: new Array() };
+    const allWidgets: Box[] = [];
 
     const commonItems = ['Table', 'Chart', 'Button', 'Text', 'Datepicker'];
     const formItems = [

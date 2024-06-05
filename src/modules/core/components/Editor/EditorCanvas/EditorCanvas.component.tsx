@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Flex, Layout, Spin, Typography } from 'antd';
 import { produce } from 'immer';
 import update from 'immutability-helper';
 import { cloneDeep } from 'lodash';
 import { DropTargetMonitor, useDrop } from 'react-dnd';
-// // @ts-ignore
+// @ts-ignore
 import GridLines from 'react-gridlines';
 import { Position, ResizableDelta } from 'react-rnd';
 import { useParams } from 'react-router-dom';
@@ -77,6 +77,7 @@ const EditorCanvas: React.FC = () => {
   const onDragStop = useCallback(
     (e: any, componentId: number, direction: DraggableData) => {
       // Get the width of the canvas
+      console.log(e)
       const canvasBounds = document
         .getElementsByClassName('real-canvas')[0]
         .getBoundingClientRect();
@@ -117,6 +118,7 @@ const EditorCanvas: React.FC = () => {
       d: ResizableDelta,
       position: Position
     ) => {
+      console.log(e,direction,ref)
       const deltaWidth = Math.round(d.width / gridWidth) * gridWidth; //rounding of width of element to nearest multiple of gridWidth
       const deltaHeight = d.height;
 
