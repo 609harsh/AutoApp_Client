@@ -75,6 +75,7 @@ export const authApi = baseApi.injectEndpoints({
         };
       },
       transformResponse: (response: User, meta, arg) => {
+        console.log(meta)
         return {
           ...response,
           token: arg.token

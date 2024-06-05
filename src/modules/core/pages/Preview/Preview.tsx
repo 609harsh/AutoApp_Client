@@ -18,8 +18,8 @@ const Preview = () => {
     isLoading,
     isSuccess,
     refetch
-  } = useFetchComponentsQuery(id);
-
+  } :Record<string, any>= useFetchComponentsQuery(id!);
+  console.log(isLoading)
   useEffect(() => {
     refetch()
   }, [isSuccess]);
@@ -39,7 +39,7 @@ const Preview = () => {
 
     <Flex className="h-screen w-screen relative preview-space bg-slate-200">
       {
-         Object.keys(boxes)?.length > 0 &&
+        Object.keys(boxes)?.length > 0 &&
         Object.keys(boxes)?.map((key) => {
           const box = boxes[key];
           const DraggableBoxProps: DraggableBoxPropsType = {

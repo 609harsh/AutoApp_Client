@@ -23,7 +23,7 @@ const Invitations: React.FC = () => {
       handleInvitation({
         company: values.companyName,
         phoneNumber: values.phoneNumber,
-        userId: id,
+        userId: id??"",
         token: invitationId
       })
         .unwrap()
