@@ -1,11 +1,26 @@
-# React + TypeScript + Vite
+# Auto APP
+It is a rapid internal tool development platform.
+Create custom internal tools quickly and easily, with less code and fewer resources. Boost productivity, cut costs, and deploy your tools faster, all while ensuring enterprise-grade security.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Demo Link: https://auto-app-client.vercel.app/
 
-Currently, two official plugins are available:
+![image](https://github.com/609harsh/AutoApp_Client/assets/97297407/1c424170-d037-45a6-afcc-7af1498d4edb)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Dashboard
+Place to manage all your apps.
+
+![image](https://github.com/609harsh/AutoApp_Client/assets/97297407/756c3b87-e4e0-4936-b59a-0c994f5385dc)
+
+# Editor
+Place to create your app,drag and drop components, preview and publish it on the web
+
+![image](https://github.com/609harsh/AutoApp_Client/assets/97297407/2f997dca-9d11-4c87-a541-b636efa97c64)
+
+
+### Tech Stack 
+- React
+- TypeScript
+- Vite
 
 ## Expanding the ESLint configuration
 
@@ -28,3 +43,5 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+Have a look at out Auto-APP-Server repository to know more!!!
